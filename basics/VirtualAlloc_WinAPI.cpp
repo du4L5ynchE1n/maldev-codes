@@ -23,8 +23,7 @@ int main() {
         VirtualFree(lpMemory, 0, MEM_RELEASE); // Free allocated memory
     }
     else {
-        printf("[-] Memory allocation failed.\n");
-        printf("Virtual Alloc Error: %d\n", GetLastError());
+        printf("[-] Memory allocation failed. Virtual Alloc Error: %d\n", GetLastError());
     }
 
     return 0;
