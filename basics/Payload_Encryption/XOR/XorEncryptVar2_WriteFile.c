@@ -53,13 +53,14 @@ VOID XorFunction(IN PBYTE pShellcode, IN SIZE_T sShellcodeSize, IN PBYTE bKey, I
 VOID shell2bin(IN PBYTE pShellcode) {
 	HANDLE file;
 	DWORD bytes_written;
+	size_t shellcodeSize = sizeof(pShellcode);
 	file = CreateFileA("shellcode.bin", GENERIC_WRITE, 0, NULL, CREATE_ALWAYS,
 		FILE_ATTRIBUTE_NORMAL, NULL);
 	if (file == INVALID_HANDLE_VALUE) {
 		printf("Unable to create bin file.\n");
 		return 1;
 	}
-	WriteFile(file, pShellcode, strlen(pShellcode), &bytes_written, NULL);
+	WriteFile(file, pShellcode, shellcodeSize, &bytes_written, NULL);
   	printf("shellcode.bin file created!");
 	CloseHandle(file);
 }
