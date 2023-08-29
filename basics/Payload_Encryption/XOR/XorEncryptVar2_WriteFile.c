@@ -50,20 +50,6 @@ VOID XorFunction(IN PBYTE pShellcode, IN SIZE_T sShellcodeSize, IN PBYTE bKey, I
 	}
 }
 
-VOID shell2bin(IN PBYTE pShellcode) {
-	HANDLE file;
-	DWORD bytes_written;
-	size_t shellcodeSize = sizeof(pShellcode);
-	file = CreateFileA("shellcode.bin", GENERIC_WRITE, 0, NULL, CREATE_ALWAYS,
-		FILE_ATTRIBUTE_NORMAL, NULL);
-	if (file == INVALID_HANDLE_VALUE) {
-		printf("Unable to create bin file.\n");
-		return 1;
-	}
-	WriteFile(file, pShellcode, shellcodeSize, &bytes_written, NULL);
-  	printf("shellcode.bin file created!");
-	CloseHandle(file);
-}
 
 int main() {
 
@@ -77,6 +63,28 @@ int main() {
 	}
 
 	printf("\n};\n");
-	shell2bin(pPayload);
 
+	HANDLE file;
+	DWORD bytes_written;
+	size_t shellcodeSize = sizeof(pPayload);
+
+	file = CreateFileA("shellcode.bin", GENERIC_WRITE, 0, NULL, CREATE_ALWAYS,
+		FILE_ATTRIBUTE_NORMAL, NULL);
+	if (file == INVALID_HANDLE_VALUE) {
+		printf("Unable to create bin file.\n");
+		return 1;
+	}
+
+	if (!WriteFile(file, pPayload, (DWORD)shellcodeSize, &bytes_written, NULL)) {
+		fprintf(stderr, "Failed to write to file.\n");
+		CloseHandle(file);
+		return 1;
+	}
+	
+	printf("shellcode.bin file created!");
+
+	//clean up
+	CloseHandle(file);
+
+	return 0;
 }
