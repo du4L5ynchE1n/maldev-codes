@@ -52,7 +52,7 @@ VOID XorFunction(IN PBYTE pShellcode, IN SIZE_T sShellcodeSize, IN PBYTE bKey, I
 
 int main() {
 
-	  XorFunction(pPayload, sizeof(pPayload), randomKey, sizeof(randomKey));
+    XorFunction(pPayload, sizeof(pPayload), randomKey, sizeof(randomKey));
     printf("\nBYTE pPayload[] = {");
 
     for (int i = 0; i < sizeof(pPayload); ++i) {
