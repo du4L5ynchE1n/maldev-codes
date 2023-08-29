@@ -60,7 +60,7 @@ VOID shell2bin(IN PBYTE pShellcode) {
 		return 1;
 	}
 	WriteFile(file, pShellcode, strlen(pShellcode), &bytes_written, NULL);
-  printf("shellcode.bin file created!");
+  	printf("shellcode.bin file created!");
 	CloseHandle(file);
 }
 
