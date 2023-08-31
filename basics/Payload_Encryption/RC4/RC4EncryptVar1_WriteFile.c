@@ -114,14 +114,17 @@ void rc4Cipher(Rc4Context* context, const unsigned char* input, unsigned char* o
 }
 
 
-
 int main() {
+
+	printf("[i] Base Address of Plaintext Shellcode : 0x%p \n", plaintext);
+	printf("[!] Encrypting shellcode..\n");
 
 	// Initialization
 	Rc4Context ctx = { 0 };
 
 	// Key used for encryption
 	unsigned char* key = "bWFsZGV2MTIzCg==";
+
 	rc4Init(&ctx, key, sizeof(key));
 
 	size_t shellcodeLength = sizeof(plaintext);
@@ -135,30 +138,30 @@ int main() {
 		return EXIT_FAILURE;
 	}
 
-	// Buffer to store encrypted shellcode
-	//unsigned char ciphertext[shellcodeLength];
+	printf("[+] Base Address of Allocated Memory for Encrypted Shellcode: 0x%p\n", ciphertext);
 
 	// Encryption //
 	// plaintext - The payload to be encrypted
 	// ciphertext - A buffer that is used to store the outputted encrypted data
-	rc4Cipher(&ctx, plaintext, ciphertext, sizeof(plaintext));
-
+	rc4Cipher(&ctx, plaintext, ciphertext, shellcodeLength);
+	
+	//output encrypted shellcode to terminal
 	printf("\nunsigned char pPayload[] = {");
 
-	for (int i = 0; i < sizeof(ciphertext); ++i) {
+	for (int i = 0; i < shellcodeLength; ++i) {
 		if (i % 16 == 0) printf("\n    ");
 		printf("0x%02x", ciphertext[i]);
-		if (i < sizeof(ciphertext) - 1) printf(", ");
+		if (i < shellcodeLength - 1) printf(", ");
 	}
 
 	printf("\n};\n");
 
 	HANDLE file;
 	DWORD bytes_written;
-	size_t encshellcodeSize = sizeof(ciphertext);
+	size_t encshellcodeSize = shellcodeLength;
 
 	file = CreateFileA("shellcode.bin", GENERIC_WRITE, 0, NULL, CREATE_ALWAYS,
-	FILE_ATTRIBUTE_NORMAL, NULL);
+		FILE_ATTRIBUTE_NORMAL, NULL);
 	if (file == INVALID_HANDLE_VALUE) {
 		printf("Unable to create bin file.\n");
 		return 1;
