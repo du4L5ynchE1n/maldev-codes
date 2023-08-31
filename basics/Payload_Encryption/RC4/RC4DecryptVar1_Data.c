@@ -125,7 +125,7 @@ int main() {
 	DWORD flProtect = PAGE_EXECUTE_READWRITE;
 	PVOID plaintext = VirtualAlloc(NULL, shellcodeLength, flAllocationType, flProtect);
 
-	printf("[+] Base Address of Allocated Memory for Decrypted Shellcode: 0x%p\n", ciphertext);
+	printf("[+] Base Address of Allocated Memory for Decrypted Shellcode: 0x%p\n", plaintext);
 
 	if (!plaintext)
 	{
