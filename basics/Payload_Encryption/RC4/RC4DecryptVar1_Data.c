@@ -111,7 +111,6 @@ void rc4Cipher(Rc4Context* context, const unsigned char* input, unsigned char* o
 int main() {
 
 	printf("[i] Base Address of Allocated Memory for Encrypted Shellcode : 0x%p \n", ciphertext);
-	printf("[!] Encrypting shellcode..\n");
 
 	// Initialization
 	Rc4Context ctx = { 0 };
