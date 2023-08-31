@@ -67,7 +67,7 @@ int main() {
 	// Printing pointer and size to the screen
 	printf("[i] pPayloadAddress var : 0x%p \n", pPayloadAddress);
 
-	// Allocating memory using a HeapAlloc call
+	// Allocating memory using a VirtualAlloc call
 	PVOID pTmpBuffer = VirtualAlloc(NULL, sPayloadSize, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
 	if (pTmpBuffer != NULL) {
 		// copying the payload from resource section to the new buffer 
