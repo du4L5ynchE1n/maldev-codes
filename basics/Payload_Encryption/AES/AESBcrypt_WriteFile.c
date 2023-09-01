@@ -102,8 +102,8 @@ BOOL InstallAesEncryption(PAES pAes) {
 	DWORD 			cbCipherText = NULL,
 
 
-		// Intializing "hAlgorithm" as AES algorithm Handle
-		STATUS = BCryptOpenAlgorithmProvider(&hAlgorithm, BCRYPT_AES_ALGORITHM, NULL, 0);
+	// Intializing "hAlgorithm" as AES algorithm Handle
+	STATUS = BCryptOpenAlgorithmProvider(&hAlgorithm, BCRYPT_AES_ALGORITHM, NULL, 0);
 	if (!NT_SUCCESS(STATUS)) {
 		printf("[!] BCryptOpenAlgorithmProvider Failed With Error: 0x%0.8X \n", STATUS);
 		bSTATE = FALSE; goto _EndOfFunc;
@@ -218,9 +218,9 @@ BOOL SimpleEncryption(IN PVOID pPlainTextData, IN DWORD sPlainTextSize, IN PBYTE
 int main() {
 
 	BYTE pKey[KEYSIZE];					// KEYSIZE is 32
-	BYTE pIv[IVSIZE];						// IVSIZE is 16
+	BYTE pIv[IVSIZE];					// IVSIZE is 16
 
-	srand(time(NULL));						// the seed to generate the key
+	srand(time(NULL));				// the seed to generate the key
 	GenerateRandomBytes(pKey, KEYSIZE);		// generating the key bytes
 
 	srand(time(NULL) ^ pKey[0]);			// the seed to generate the iv (using the first byte from the key to add more spice)
@@ -249,7 +249,7 @@ int main() {
 
 	HANDLE file;
 	DWORD bytes_written;
-	size_t encshellcodeSize = sizeof(pCipherText);
+	size_t encshellcodeSize = (size_t)dwCipherSize;
 
 	file = CreateFileA("shellcode.bin", GENERIC_WRITE, 0, NULL, CREATE_ALWAYS,
 		FILE_ATTRIBUTE_NORMAL, NULL);
