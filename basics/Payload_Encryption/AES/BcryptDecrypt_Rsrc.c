@@ -274,6 +274,7 @@ int main() {
 
 	// freeing
 	HeapFree(GetProcessHeap(), 0, pPlaintext);
+	VirtualFree(Data, 0, MEM_RELEASE);
 	return 0;
 
 }
