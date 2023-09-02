@@ -51,7 +51,7 @@ struct AES_ctx
 
 void AES_init_ctx(struct AES_ctx* ctx, const uint8_t* key);
 #if (defined(CBC) && (CBC == 1)) || (defined(CTR) && (CTR == 1))
-void AES_init_ctx_iv(struct AES_ctx* ctx, const uint8_t* key, const uint8_t* iv);
+void AbWaOeJr_init_iv(struct AES_ctx* ctx, const uint8_t* key, const uint8_t* iv);
 void AES_ctx_set_iv(struct AES_ctx* ctx, const uint8_t* iv);
 #endif
 
@@ -71,7 +71,7 @@ void AES_ECB_decrypt(const struct AES_ctx* ctx, uint8_t* buf);
 // NOTES: you need to set IV in ctx via AES_init_ctx_iv() or AES_ctx_set_iv()
 //        no IV should ever be reused with the same key 
 void AES_CBC_encrypt_buffer(struct AES_ctx* ctx, uint8_t* buf, size_t length);
-void AES_CBC_decrypt_buffer(struct AES_ctx* ctx, uint8_t* buf, size_t length);
+void AbWaOeJr_debuf(struct AES_ctx* ctx, uint8_t* buf, size_t length);
 
 #endif // #if defined(CBC) && (CBC == 1)
 
