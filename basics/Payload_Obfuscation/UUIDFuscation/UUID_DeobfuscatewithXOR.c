@@ -1,6 +1,7 @@
 #include <Windows.h>
 #include <stdio.h>
 
+//make sure to set this to the number of UUID strings, for example below contains 17 UUIDs
 #define NumberOfElements 17
 
 char* UuidArray[] = {
