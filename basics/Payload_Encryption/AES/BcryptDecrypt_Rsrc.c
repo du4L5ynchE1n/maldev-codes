@@ -254,7 +254,7 @@ int main() {
 	// printing the decrypted data to the screen as hex, this will look the same as the variable "Data" from the encryption snippet
 	PrintHexData("PlainText", pPlaintext, dwPlainSize);
 
-	printf("[i] Base Address of Encrypted Shellcode : 0x%p \n", pPlaintext);
+	printf("[i] Base Address of Decrypted Shellcode : 0x%p \n", pPlaintext);
 
 	// Make the memory executable (Windows-specific)
 	DWORD oldProtect;
