@@ -1,5 +1,3 @@
-// @NUL0x4C | @mrd0x : MalDevAcademy
-
 #include <Windows.h>
 #include <stdio.h>
 
