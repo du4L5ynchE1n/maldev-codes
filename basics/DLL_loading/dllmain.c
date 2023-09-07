@@ -2,6 +2,7 @@
 #include <Windows.h>
 #include <stdio.h>
 
+//exported function declared with extern __declspec(dllexport)
 extern __declspec(dllexport) void HelloUser() {
     char buffer[256];
     DWORD bufferSize = sizeof(buffer);
