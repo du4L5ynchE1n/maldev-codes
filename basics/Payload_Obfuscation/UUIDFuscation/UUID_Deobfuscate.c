@@ -79,9 +79,10 @@ int main() {
 	PBYTE	pDAddress = NULL;
 	SIZE_T	sDSize = NULL;
 
-	if (!UuidDeobfuscation(UuidArray, NumberOfElements, &pDAddress, &sDSize))
+	if (!UuidDeobfuscation(UuidArray, NumberOfElements, &pDAddress, &sDSize)) {
 		return -1;
-
+	}
+	
 	printf("[+] Deobfuscated Bytes at 0x%p of Size %ld ::: \n", pDAddress, sDSize);
 	for (size_t i = 0; i < sDSize; i++) {
 		if (i % 16 == 0)
