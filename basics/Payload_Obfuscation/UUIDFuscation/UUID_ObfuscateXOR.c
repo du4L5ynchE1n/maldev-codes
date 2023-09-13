@@ -206,12 +206,6 @@ int main() {
 		}
 	}
 
-	if (!GenerateUuidOutput(rawData, sizeof(rawData))) {
-		// if failed, that is sizeof(rawData) isnt multiple of 16
-		return -1;
-	}
-
-
 	printf("[#] Press <Enter> To Quit ...");
 
 	// Freeing PaddedBuffer, if needed
