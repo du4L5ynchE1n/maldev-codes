@@ -214,6 +214,8 @@ BOOL InjectShellcodeToRemoteProcess(HANDLE hProcess, PBYTE pShellcode, SIZE_T sS
 	}
 	printf("[+] DONE !\n");
 
+	VirtualFreeEx(hProcess, pShellcodeAddress, 0, MEM_RELEASE);
+
 	return TRUE;
 }
 
