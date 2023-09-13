@@ -13,7 +13,7 @@ int main() {
     };
 
     // Open a file for writing using Windows API
-    HANDLE hFile = CreateFile("shellcodeuuid.txt", GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+    HANDLE hFile = CreateFileA("shellcodeuuid.txt", GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
     if (hFile == INVALID_HANDLE_VALUE) {
         perror("Error opening file");
         return -1;
@@ -37,10 +37,10 @@ int main() {
         }
     }
 
-    printf
+    printf("UUID obfuscated shellcode written to shellcodeuuid.txt");
 
     // Close the file
     CloseHandle(hFile);
 
-    return 0;
+    return 0; 
 }
