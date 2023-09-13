@@ -93,9 +93,9 @@ BOOL GenerateUuidOutput(unsigned char* pShellcode, SIZE_T ShellcodeSize) {
 				// Printing the last UUID string
 				printf("\"%s\"", UUID);
 				if (!WriteFile(hfile, UUID, strlen(UUID), &bytesWritten, NULL)) {
-            		perror("Error writing to file");
-            		CloseHandle(hfile);
-            		return -1;
+            				perror("Error writing to file");
+            				CloseHandle(hfile);
+            				return -1;
         		}
 				break;
 			}
@@ -103,9 +103,9 @@ BOOL GenerateUuidOutput(unsigned char* pShellcode, SIZE_T ShellcodeSize) {
 				// Printing the UUID string
 				printf("\"%s\", ", UUID);
 				if (!WriteFile(hfile, UUID, strlen(UUID), &bytesWritten, NULL)) {
-            		perror("Error writing to file");
-            		CloseHandle(hfile);
-            		return -1;
+            				perror("Error writing to file");
+            				CloseHandle(hfile);
+            				return -1;
         		}
 			}
 			c = 1;
