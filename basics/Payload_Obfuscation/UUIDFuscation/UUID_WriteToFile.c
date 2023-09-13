@@ -28,13 +28,6 @@ int main() {
             CloseHandle(hFile);
             return -1;
         }
-        // Add a newline character after each UUID
-        char newline = '\n';
-        if (!WriteFile(hFile, &newline, 1, &bytesWritten, NULL)) {
-            perror("Error writing newline to file");
-            CloseHandle(hFile);
-            return -1;
-        }
     }
 
     printf("UUID obfuscated shellcode written to shellcodeuuid.txt");
@@ -42,5 +35,5 @@ int main() {
     // Close the file
     CloseHandle(hFile);
 
-    return 0; 
+    return 0;
 }
