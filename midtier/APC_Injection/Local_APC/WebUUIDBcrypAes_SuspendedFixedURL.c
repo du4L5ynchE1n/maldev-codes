@@ -224,11 +224,11 @@ BOOL GetUUIDFromUrl(LPCWSTR szUrl, CHAR* UUID[]) {
 
     BOOL		bSTATE = TRUE;
 
-    HINTERNET	hInternet = NULL,
-                hUrl = NULL;
+    HINTERNET		hInternet = NULL,
+                	hUrl = NULL;
 
     // Read and store the UUIDs from the URL without null terminators
-    char buffer[37]; // Assuming each UUID has 36 characters without a null terminator
+    char buffer[37]; // Assuming each UUID has 36 characters with a null terminator
     DWORD bytesRead;
 
     // Opening the internet session handle, all arguments are NULL here since no proxy options are required
