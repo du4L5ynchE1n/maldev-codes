@@ -369,7 +369,8 @@ int main() {
 	if (!SimpleDecryption(pAddress, (DWORD)Size, pKey, pIv, &pPlaintext, &dwPlainSize)) {
 		return -1;
 	}
-  
+
+
 	HANDLE	hTimer		= NULL;
 
 	printf("[#] Press <Enter> To Run The Payload ... ");
@@ -391,9 +392,6 @@ int main() {
 		HeapFree(GetProcessHeap(), 0, pPlaintext);
 	if (pAddress)
 		UnmapViewOfFile(pAddress);
-	if (hTimer)
-		CloseHandle(hTimer);
-
 	return 0;
 }
 
