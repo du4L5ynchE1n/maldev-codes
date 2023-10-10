@@ -492,6 +492,12 @@ int wmain(int argc, wchar_t* argv[]) {
 		HeapFree(GetProcessHeap(), 0, pPlaintext);
 	if (hThread)
 		CloseHandle(hThread);
+	if (pLAddress)
+		UnmapViewOfFile(pRAddress);
+	if (pRAddress)
+		UnmapViewOfFile2(hProcess, pRAddress, NULL);
+	if (hProcess)
+		CloseHandle(hProcess);
 
 	return 0;
 }
