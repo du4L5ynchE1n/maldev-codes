@@ -590,7 +590,7 @@ int wmain(int argc, wchar_t* argv[]) {
 	if (hThread)
 		CloseHandle(hThread);
 	if (pLAddress)
-		UnmapViewOfFile(pRAddress);
+		UnmapViewOfFile(pLAddress);
 	if (pRAddress)
 		UnmapViewOfFile2(hProcess, pRAddress, NULL);
 	if (hProcess)
