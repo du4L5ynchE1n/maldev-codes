@@ -1,4 +1,5 @@
 // Add process enumeration functionality into the PPID function to programmatically fetch a parent process's handle.
+// sihost.exe is a good process to be used when spoofing PPID due to the fact that that it's a noisy process.
 
 #include <Windows.h>
 #include <stdio.h>
