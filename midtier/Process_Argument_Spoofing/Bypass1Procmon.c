@@ -1,5 +1,6 @@
 #include <Windows.h>
 #include <stdio.h>
+// used for NTSTATUS, PROCESSINFOCLASS, PROCESS_BASIC_INFORMATION, RTL_USER_PROCESS_PARAMETERS
 #include <winternl.h>
 
 
